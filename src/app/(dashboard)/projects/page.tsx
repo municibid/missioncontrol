@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Plus, CheckSquare, FileText, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -50,7 +51,7 @@ function ProjectCard({ project }: { project: Project }) {
   };
 
   return (
-    <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6 hover:border-zinc-600 transition-all">
+    <Link href={`/projects/${project.id}`} className="bg-[#18181b] rounded-xl border border-[#27272a] p-6 hover:border-zinc-600 hover:bg-[#1c1c1f] transition-all cursor-pointer block">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={clsx('w-3 h-3 rounded-full', businessLineColors[project.business_line] || 'bg-zinc-500')} />
@@ -93,7 +94,7 @@ function ProjectCard({ project }: { project: Project }) {
       <div className="mt-4 pt-4 border-t border-[#27272a] text-xs text-zinc-600">
         Last activity: {formatTime(project.updated_at)}
       </div>
-    </div>
+    </Link>
   );
 }
 
