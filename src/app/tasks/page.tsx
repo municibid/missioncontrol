@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { Plus, MoreHorizontal, Clock, User, AlertCircle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, MoreHorizontal, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
 
 type TaskStatus = 'backlog' | 'in_progress' | 'review' | 'done';
@@ -10,22 +10,21 @@ type Priority = 'low' | 'medium' | 'high' | 'urgent';
 interface Task {
   id: string;
   title: string;
-  description: string;
+  description: string | null;
   status: TaskStatus;
-  assignee: 'greg' | 'marty' | 'mara';
+  assignee: string;
   priority: Priority;
-  createdAt: string;
+  created_at: string;
 }
 
-// Mock data - will be replaced with real API calls
-const initialTasks: Task[] = [
-  { id: '1', title: 'Build Mission Control Task Board', description: 'Create Kanban board with drag and drop', status: 'in_progress', assignee: 'marty', priority: 'high', createdAt: '2026-03-03' },
-  { id: '2', title: 'Set up Neon database schema', description: 'Create tables for tasks, projects, memories', status: 'in_progress', assignee: 'marty', priority: 'high', createdAt: '2026-03-03' },
-  { id: '3', title: 'Weekly SEO Report automation', description: 'Run Lighthouse checks every Monday', status: 'done', assignee: 'marty', priority: 'medium', createdAt: '2026-03-02' },
-  { id: '4', title: 'Review Webflow migration options', description: 'Cloudflare Workers vs Azure Front Door', status: 'review', assignee: 'greg', priority: 'medium', createdAt: '2026-03-02' },
-  { id: '5', title: 'MARA CRM - RFP module', description: 'Build RFP tracking and response system', status: 'backlog', assignee: 'marty', priority: 'high', createdAt: '2026-03-01' },
-  { id: '6', title: 'Surplus.ai landing page', description: 'Design and build the launch page', status: 'backlog', assignee: 'marty', priority: 'medium', createdAt: '2026-03-01' },
-];
+interface Activity {
+  id: string;
+  agent: string;
+  action: string;
+  target: string;
+  details: string | null;
+  created_at: string;
+}
 
 const columns: { id: TaskStatus; title: string; color: string }[] = [
   { id: 'backlog', title: 'Backlog', color: 'bg-zinc-800/50' },
@@ -45,18 +44,30 @@ const assigneeAvatars: Record<string, { bg: string; letter: string }> = {
   greg: { bg: 'bg-indigo-500', letter: 'G' },
   marty: { bg: 'bg-gradient-to-br from-emerald-400 to-cyan-500', letter: 'M' },
   mara: { bg: 'bg-purple-500', letter: '💜' },
+  unassigned: { bg: 'bg-zinc-600', letter: '?' },
 };
 
-function TaskCard({ task }: { task: Task }) {
-  const avatar = assigneeAvatars[task.assignee];
+function TaskCard({ task, onUpdate }: { task: Task; onUpdate: () => void }) {
+  const avatar = assigneeAvatars[task.assignee] || assigneeAvatars.unassigned;
+  
+  const handleStatusChange = async (newStatus: TaskStatus) => {
+    await fetch(`/api/tasks/${task.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus }),
+    });
+    onUpdate();
+  };
   
   return (
-    <div className="bg-[#18181b] rounded-lg border border-[#27272a] p-4 hover:border-zinc-600 transition-all cursor-pointer">
+    <div className="bg-[#18181b] rounded-lg border border-[#27272a] p-4 hover:border-zinc-600 transition-all cursor-pointer group">
       <div className="flex items-start justify-between gap-2 mb-2">
         <h3 className="font-medium text-white text-sm leading-tight">{task.title}</h3>
-        <button className="text-zinc-500 hover:text-zinc-300 shrink-0">
-          <MoreHorizontal className="w-4 h-4" />
-        </button>
+        <div className="relative">
+          <button className="text-zinc-500 hover:text-zinc-300 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+            <MoreHorizontal className="w-4 h-4" />
+          </button>
+        </div>
       </div>
       
       {task.description && (
@@ -77,42 +88,92 @@ function TaskCard({ task }: { task: Task }) {
   );
 }
 
-function ActivityFeed() {
-  const activities = [
-    { id: 1, agent: 'Marty', action: 'moved', target: 'Task Board', to: 'In Progress', time: '2m ago' },
-    { id: 2, agent: 'Marty', action: 'created', target: 'Database Schema', time: '5m ago' },
-    { id: 3, agent: 'Marty', action: 'completed', target: 'Weekly SEO Report', time: '1h ago' },
-    { id: 4, agent: 'Marty', action: 'updated', target: 'Webflow Guide', time: '2h ago' },
-  ];
+function ActivityFeed({ activities }: { activities: Activity[] }) {
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  };
 
   return (
     <div className="w-80 border-l border-[#27272a] bg-[#0c0c0f] p-4 overflow-y-auto">
       <h2 className="font-semibold text-white mb-4">Activity Feed</h2>
       <div className="space-y-3">
-        {activities.map((activity) => (
-          <div key={activity.id} className="flex items-start gap-3 text-sm">
-            <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
-              M
+        {activities.length === 0 ? (
+          <p className="text-zinc-500 text-sm">No recent activity</p>
+        ) : (
+          activities.map((activity) => (
+            <div key={activity.id} className="flex items-start gap-3 text-sm">
+              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0 mt-0.5">
+                {activity.agent?.[0]?.toUpperCase() || 'M'}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-zinc-300">
+                  <span className="font-medium text-white">{activity.agent}</span>{' '}
+                  {activity.action}{' '}
+                  <span className="font-medium text-white">{activity.target}</span>
+                  {activity.details && <span className="text-zinc-400"> → {activity.details}</span>}
+                </p>
+                <p className="text-xs text-zinc-500">{formatTime(activity.created_at)}</p>
+              </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-zinc-300">
-                <span className="font-medium text-white">{activity.agent}</span>{' '}
-                {activity.action}{' '}
-                <span className="font-medium text-white">{activity.target}</span>
-                {activity.to && <span className="text-zinc-400"> → {activity.to}</span>}
-              </p>
-              <p className="text-xs text-zinc-500">{activity.time}</p>
-            </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );
 }
 
 export default function TaskBoard() {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
   const [showNewTask, setShowNewTask] = useState(false);
+  const [newTask, setNewTask] = useState({ title: '', description: '', assignee: 'marty', priority: 'medium' });
+
+  const fetchData = async () => {
+    try {
+      const [tasksRes, activityRes] = await Promise.all([
+        fetch('/api/tasks'),
+        fetch('/api/activity?limit=10'),
+      ]);
+      setTasks(await tasksRes.json());
+      setActivities(await activityRes.json());
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+    // Poll for updates every 30 seconds
+    const interval = setInterval(fetchData, 30000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const handleCreateTask = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      await fetch('/api/tasks', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTask),
+      });
+      setShowNewTask(false);
+      setNewTask({ title: '', description: '', assignee: 'marty', priority: 'medium' });
+      fetchData();
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  };
 
   const getTasksByStatus = (status: TaskStatus) => 
     tasks.filter(task => task.status === status);
@@ -126,13 +187,22 @@ export default function TaskBoard() {
             <h1 className="text-2xl font-bold text-white">Task Board</h1>
             <p className="text-zinc-500 mt-1">Manage tasks across all projects</p>
           </div>
-          <button 
-            onClick={() => setShowNewTask(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
-          >
-            <Plus className="w-4 h-4" />
-            New Task
-          </button>
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={fetchData}
+              className="p-2 text-zinc-400 hover:text-white hover:bg-[#27272a] rounded-lg transition-colors"
+              title="Refresh"
+            >
+              <RefreshCw className={clsx('w-5 h-5', loading && 'animate-spin')} />
+            </button>
+            <button 
+              onClick={() => setShowNewTask(true)}
+              className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+              New Task
+            </button>
+          </div>
         </div>
       </div>
 
@@ -150,7 +220,7 @@ export default function TaskBoard() {
                 </div>
                 <div className="space-y-3">
                   {getTasksByStatus(column.id).map((task) => (
-                    <TaskCard key={task.id} task={task} />
+                    <TaskCard key={task.id} task={task} onUpdate={fetchData} />
                   ))}
                 </div>
               </div>
@@ -159,7 +229,7 @@ export default function TaskBoard() {
         </div>
 
         {/* Activity Feed Sidebar */}
-        <ActivityFeed />
+        <ActivityFeed activities={activities} />
       </div>
 
       {/* New Task Modal */}
@@ -167,11 +237,14 @@ export default function TaskBoard() {
         <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
           <div className="bg-[#18181b] rounded-xl border border-[#27272a] shadow-xl w-full max-w-lg p-6 m-4">
             <h2 className="text-xl font-semibold text-white mb-4">New Task</h2>
-            <form className="space-y-4">
+            <form onSubmit={handleCreateTask} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1">Title</label>
                 <input 
                   type="text" 
+                  required
+                  value={newTask.title}
+                  onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
                   className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Task title..."
                 />
@@ -179,6 +252,8 @@ export default function TaskBoard() {
               <div>
                 <label className="block text-sm font-medium text-zinc-300 mb-1">Description</label>
                 <textarea 
+                  value={newTask.description}
+                  onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
                   className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   rows={3}
                   placeholder="Describe the task..."
@@ -187,7 +262,11 @@ export default function TaskBoard() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-1">Assignee</label>
-                  <select className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <select 
+                    value={newTask.assignee}
+                    onChange={(e) => setNewTask({ ...newTask, assignee: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
                     <option value="marty">Marty</option>
                     <option value="greg">Greg</option>
                     <option value="mara">MARA</option>
@@ -195,9 +274,13 @@ export default function TaskBoard() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-zinc-300 mb-1">Priority</label>
-                  <select className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                    <option value="medium">Medium</option>
+                  <select 
+                    value={newTask.priority}
+                    onChange={(e) => setNewTask({ ...newTask, priority: e.target.value })}
+                    className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  >
                     <option value="low">Low</option>
+                    <option value="medium">Medium</option>
                     <option value="high">High</option>
                     <option value="urgent">Urgent</option>
                   </select>

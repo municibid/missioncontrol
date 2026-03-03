@@ -1,78 +1,20 @@
 'use client';
 
-import { useState } from 'react';
-import { FolderKanban, Plus, ExternalLink, CheckSquare, FileText, Brain } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Plus, CheckSquare, FileText, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface Project {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
   status: 'active' | 'paused' | 'completed';
   progress: number;
-  businessLine: 'municibid' | 'surplus_com' | 'surplus_ai' | 'personal';
-  tasksCount: number;
-  docsCount: number;
-  lastActivity: string;
+  business_line: string;
+  tasks_count: string;
+  docs_count: string;
+  updated_at: string;
 }
-
-const mockProjects: Project[] = [
-  {
-    id: '1',
-    name: 'MARA CRM Development',
-    description: 'RFP module, intelligence engine, outreach platform, sales enablement',
-    status: 'active',
-    progress: 35,
-    businessLine: 'municibid',
-    tasksCount: 12,
-    docsCount: 8,
-    lastActivity: '2 hours ago',
-  },
-  {
-    id: '2',
-    name: 'Surplus.com 2.0',
-    description: 'Vercel + Neon Postgres migration, government surplus meta-search',
-    status: 'active',
-    progress: 20,
-    businessLine: 'surplus_com',
-    tasksCount: 6,
-    docsCount: 3,
-    lastActivity: '1 day ago',
-  },
-  {
-    id: '3',
-    name: 'Surplus.ai Platform',
-    description: 'AI-agent-driven marketplace, Command Line Marketplace concept',
-    status: 'active',
-    progress: 10,
-    businessLine: 'surplus_ai',
-    tasksCount: 4,
-    docsCount: 5,
-    lastActivity: '3 days ago',
-  },
-  {
-    id: '4',
-    name: 'Municibid 20th Anniversary',
-    description: '20 Days of Municibid campaign, prize structures, marketing automation',
-    status: 'active',
-    progress: 5,
-    businessLine: 'municibid',
-    tasksCount: 8,
-    docsCount: 2,
-    lastActivity: '1 week ago',
-  },
-  {
-    id: '5',
-    name: 'AI Strategy Consulting',
-    description: 'Trade business vertical, contractor/HVAC/plumbing targeting',
-    status: 'paused',
-    progress: 15,
-    businessLine: 'municibid',
-    tasksCount: 3,
-    docsCount: 1,
-    lastActivity: '2 weeks ago',
-  },
-];
 
 const businessLineColors: Record<string, string> = {
   municibid: 'bg-blue-500',
@@ -95,12 +37,24 @@ const statusStyles: Record<string, string> = {
 };
 
 function ProjectCard({ project }: { project: Project }) {
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / 3600000);
+    if (diffHours < 1) return 'just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 7) return `${diffDays}d ago`;
+    return `${Math.floor(diffDays / 7)}w ago`;
+  };
+
   return (
     <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6 hover:border-zinc-600 transition-all">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className={clsx('w-3 h-3 rounded-full', businessLineColors[project.businessLine])} />
-          <span className="text-xs text-zinc-500">{businessLineLabels[project.businessLine]}</span>
+          <div className={clsx('w-3 h-3 rounded-full', businessLineColors[project.business_line] || 'bg-zinc-500')} />
+          <span className="text-xs text-zinc-500">{businessLineLabels[project.business_line] || project.business_line}</span>
         </div>
         <span className={clsx('px-2 py-1 rounded-full text-xs font-medium', statusStyles[project.status])}>
           {project.status}
@@ -108,7 +62,7 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       <h3 className="font-semibold text-white text-lg mb-2">{project.name}</h3>
-      <p className="text-sm text-zinc-500 mb-4 line-clamp-2">{project.description}</p>
+      <p className="text-sm text-zinc-500 mb-4 line-clamp-2">{project.description || 'No description'}</p>
 
       {/* Progress Bar */}
       <div className="mb-4">
@@ -128,27 +82,45 @@ function ProjectCard({ project }: { project: Project }) {
       <div className="flex items-center gap-4 text-sm text-zinc-500">
         <div className="flex items-center gap-1">
           <CheckSquare className="w-4 h-4" />
-          <span>{project.tasksCount} tasks</span>
+          <span>{project.tasks_count || 0} tasks</span>
         </div>
         <div className="flex items-center gap-1">
           <FileText className="w-4 h-4" />
-          <span>{project.docsCount} docs</span>
+          <span>{project.docs_count || 0} docs</span>
         </div>
       </div>
 
       <div className="mt-4 pt-4 border-t border-[#27272a] text-xs text-zinc-600">
-        Last activity: {project.lastActivity}
+        Last activity: {formatTime(project.updated_at)}
       </div>
     </div>
   );
 }
 
 export default function ProjectsPage() {
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
 
+  const fetchProjects = async () => {
+    try {
+      const res = await fetch('/api/projects');
+      const data = await res.json();
+      setProjects(data);
+    } catch (error) {
+      console.error('Error fetching projects:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
   const filteredProjects = filter === 'all' 
-    ? mockProjects 
-    : mockProjects.filter(p => p.businessLine === filter || p.status === filter);
+    ? projects 
+    : projects.filter(p => p.business_line === filter || p.status === filter);
 
   return (
     <div className="p-8">
@@ -158,10 +130,19 @@ export default function ProjectsPage() {
           <h1 className="text-2xl font-bold text-white">Projects</h1>
           <p className="text-zinc-500 mt-1">Track progress across all initiatives</p>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
-          <Plus className="w-4 h-4" />
-          New Project
-        </button>
+        <div className="flex items-center gap-3">
+          <button 
+            onClick={fetchProjects}
+            className="p-2 text-zinc-400 hover:text-white hover:bg-[#27272a] rounded-lg transition-colors"
+            title="Refresh"
+          >
+            <RefreshCw className={clsx('w-5 h-5', loading && 'animate-spin')} />
+          </button>
+          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
+            <Plus className="w-4 h-4" />
+            New Project
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
@@ -194,6 +175,12 @@ export default function ProjectsPage() {
           <ProjectCard key={project.id} project={project} />
         ))}
       </div>
+
+      {filteredProjects.length === 0 && !loading && (
+        <div className="text-center py-12">
+          <p className="text-zinc-500">No projects found</p>
+        </div>
+      )}
     </div>
   );
 }

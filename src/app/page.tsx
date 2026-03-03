@@ -1,32 +1,97 @@
-import { CheckSquare, Calendar, FolderKanban, FileText, Brain, Users, Activity, Clock } from 'lucide-react';
+'use client';
+
+import { useEffect, useState } from 'react';
+import { CheckSquare, Calendar, FolderKanban, FileText, Activity, Clock, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { clsx } from 'clsx';
 
-const stats = [
-  { name: 'Active Tasks', value: '12', change: '+3 today', icon: CheckSquare, href: '/tasks' },
-  { name: 'Scheduled Jobs', value: '8', change: 'Next: 2h', icon: Calendar, href: '/calendar' },
-  { name: 'Projects', value: '5', change: '2 active', icon: FolderKanban, href: '/projects' },
-  { name: 'Documents', value: '47', change: '+5 this week', icon: FileText, href: '/documents' },
-];
+interface Stats {
+  tasks: number;
+  projects: number;
+  documents: number;
+}
 
-const recentActivity = [
-  { id: 1, action: 'Completed task', target: 'Weekly WFA Newsletter Draft', time: '2 min ago', agent: 'Marty' },
-  { id: 2, action: 'Created document', target: 'Webflow Migration Guide', time: '15 min ago', agent: 'Marty' },
-  { id: 3, action: 'Updated memory', target: 'Municibid Team Contacts', time: '1 hour ago', agent: 'Marty' },
-  { id: 4, action: 'Scheduled cron', target: 'Weekly SEO Report', time: '2 hours ago', agent: 'Marty' },
-  { id: 5, action: 'Completed task', target: 'WFA Monitor Check', time: '3 hours ago', agent: 'Marty' },
-];
+interface ActivityItem {
+  id: string;
+  agent: string;
+  action: string;
+  target: string;
+  details: string | null;
+  created_at: string;
+}
 
 export default function Dashboard() {
+  const [stats, setStats] = useState<Stats>({ tasks: 0, projects: 0, documents: 0 });
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchData = async () => {
+    try {
+      const [tasksRes, projectsRes, docsRes, activityRes] = await Promise.all([
+        fetch('/api/tasks'),
+        fetch('/api/projects'),
+        fetch('/api/documents'),
+        fetch('/api/activity?limit=5'),
+      ]);
+
+      const tasks = await tasksRes.json();
+      const projects = await projectsRes.json();
+      const documents = await docsRes.json();
+      const activityData = await activityRes.json();
+
+      setStats({
+        tasks: Array.isArray(tasks) ? tasks.filter((t: { status: string }) => t.status !== 'done').length : 0,
+        projects: Array.isArray(projects) ? projects.filter((p: { status: string }) => p.status === 'active').length : 0,
+        documents: Array.isArray(documents) ? documents.length : 0,
+      });
+      setActivity(Array.isArray(activityData) ? activityData : []);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const formatTime = (dateStr: string) => {
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    if (diffMins < 1) return 'just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${Math.floor(diffHours / 24)}d ago`;
+  };
+
+  const statCards = [
+    { name: 'Active Tasks', value: stats.tasks.toString(), change: 'In progress', icon: CheckSquare, href: '/tasks' },
+    { name: 'Scheduled Jobs', value: '8', change: 'Cron jobs', icon: Calendar, href: '/calendar' },
+    { name: 'Active Projects', value: stats.projects.toString(), change: 'In progress', icon: FolderKanban, href: '/projects' },
+    { name: 'Documents', value: stats.documents.toString(), change: 'Total', icon: FileText, href: '/documents' },
+  ];
+
   return (
     <div className="p-8">
       {/* Header */}
-      <div className="mb-8">
+      <div className="flex items-center justify-between mb-8">
         <h1 className="text-2xl font-bold text-white">Marty Mission Control</h1>
+        <button 
+          onClick={fetchData}
+          className="p-2 text-zinc-400 hover:text-white hover:bg-[#27272a] rounded-lg transition-colors"
+          title="Refresh"
+        >
+          <RefreshCw className={clsx('w-5 h-5', loading && 'animate-spin')} />
+        </button>
       </div>
 
       {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-        {stats.map((stat) => (
+        {statCards.map((stat) => (
           <Link
             key={stat.name}
             href={stat.href}
@@ -55,21 +120,25 @@ export default function Dashboard() {
             <Activity className="w-5 h-5 text-zinc-500" />
           </div>
           <div className="space-y-4">
-            {recentActivity.map((item) => (
-              <div key={item.id} className="flex items-start gap-4">
-                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
-                  M
+            {activity.length === 0 ? (
+              <p className="text-zinc-500 text-sm">No recent activity</p>
+            ) : (
+              activity.map((item) => (
+                <div key={item.id} className="flex items-start gap-4">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                    {item.agent?.[0]?.toUpperCase() || 'M'}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm text-zinc-300">
+                      <span className="font-medium text-white">{item.agent}</span>
+                      {' '}{item.action}{' '}
+                      <span className="font-medium text-white">{item.target}</span>
+                    </p>
+                    <p className="text-xs text-zinc-500 mt-0.5">{formatTime(item.created_at)}</p>
+                  </div>
                 </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-300">
-                    <span className="font-medium text-white">{item.agent}</span>
-                    {' '}{item.action}{' '}
-                    <span className="font-medium text-white">{item.target}</span>
-                  </p>
-                  <p className="text-xs text-zinc-500 mt-0.5">{item.time}</p>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 
