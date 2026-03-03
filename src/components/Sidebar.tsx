@@ -34,10 +34,12 @@ export function Sidebar() {
       {/* Logo */}
       <div className="px-6 py-5 border-b border-[#1f1f23]">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center">
-            <span className="text-white font-bold text-sm">M</span>
-          </div>
-          <h1 className="font-semibold text-white">Marty Mission Control</h1>
+          <img 
+            src="/marty-logo.png" 
+            alt="Marty" 
+            className="w-10 h-10 rounded-lg object-cover"
+          />
+          <h1 className="font-semibold text-white">Mission Control</h1>
         </div>
       </div>
 

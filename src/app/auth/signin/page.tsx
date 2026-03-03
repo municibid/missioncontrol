@@ -7,6 +7,11 @@ export default function SignIn() {
     <div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center">
       <div className="bg-[#12121a] border border-[#2a2a3a] rounded-lg p-8 max-w-md w-full mx-4">
         <div className="text-center mb-8">
+          <img 
+            src="/marty-logo.png" 
+            alt="Marty" 
+            className="w-20 h-20 mx-auto mb-4 rounded-xl"
+          />
           <h1 className="text-2xl font-bold text-white mb-2">Mission Control</h1>
           <p className="text-gray-400">Sign in with your Municibid account</p>
         </div>
