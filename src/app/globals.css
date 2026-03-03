@@ -1,27 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --background: #fafafa;
-  --foreground: #171717;
-  --sidebar-bg: #1a1a2e;
-  --sidebar-text: #e4e4e7;
-  --sidebar-hover: #16213e;
-  --sidebar-active: #0f3460;
+  --background: #0f0f13;
+  --foreground: #e4e4e7;
+  --card-bg: #18181b;
+  --card-border: #27272a;
+  --sidebar-bg: #0c0c0f;
+  --sidebar-text: #a1a1aa;
+  --sidebar-hover: #1f1f23;
+  --sidebar-active: #2563eb;
   --accent: #6366f1;
   --accent-hover: #4f46e5;
-  --border: #e5e7eb;
-  --muted: #6b7280;
+  --border: #27272a;
+  --muted: #71717a;
   --success: #22c55e;
   --warning: #f59e0b;
   --error: #ef4444;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --border: #27272a;
-  }
 }
 
 body {
@@ -41,10 +35,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #3f3f46;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #52525b;
 }

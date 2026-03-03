@@ -3,8 +3,8 @@ import "./globals.css";
 import { Sidebar } from "@/components/Sidebar";
 
 export const metadata: Metadata = {
-  title: "Mission Control | OpenClaw Operations",
-  description: "Centralized command center for OpenClaw agent operations",
+  title: "Marty Mission Control",
+  description: "Centralized command center for Marty agent operations",
 };
 
 export default function RootLayout({

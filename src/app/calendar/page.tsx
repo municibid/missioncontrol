@@ -26,17 +26,17 @@ const mockJobs: ScheduledJob[] = [
 ];
 
 const businessLineColors: Record<string, string> = {
-  municibid: 'bg-blue-100 text-blue-700 border-blue-200',
-  surplus_com: 'bg-green-100 text-green-700 border-green-200',
-  surplus_ai: 'bg-purple-100 text-purple-700 border-purple-200',
-  personal: 'bg-gray-100 text-gray-700 border-gray-200',
+  municibid: 'bg-blue-900/50 text-blue-300 border-blue-700/50',
+  surplus_com: 'bg-green-900/50 text-green-300 border-green-700/50',
+  surplus_ai: 'bg-purple-900/50 text-purple-300 border-purple-700/50',
+  personal: 'bg-zinc-800 text-zinc-300 border-zinc-700',
 };
 
 const statusIcons: Record<string, React.ReactNode> = {
-  pending: <Clock className="w-4 h-4 text-gray-400" />,
-  running: <div className="w-4 h-4 border-2 border-blue-500 border-t-transparent rounded-full animate-spin" />,
-  completed: <CheckCircle className="w-4 h-4 text-green-500" />,
-  failed: <XCircle className="w-4 h-4 text-red-500" />,
+  pending: <Clock className="w-4 h-4 text-zinc-400" />,
+  running: <div className="w-4 h-4 border-2 border-blue-400 border-t-transparent rounded-full animate-spin" />,
+  completed: <CheckCircle className="w-4 h-4 text-green-400" />,
+  failed: <XCircle className="w-4 h-4 text-red-400" />,
 };
 
 export default function CalendarPage() {
@@ -55,22 +55,22 @@ export default function CalendarPage() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="px-8 py-6 border-b border-gray-200 bg-white">
+      <div className="px-8 py-6 border-b border-[#27272a] bg-[#0f0f13]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Calendar</h1>
-            <p className="text-gray-500 mt-1">Scheduled jobs and automations</p>
+            <h1 className="text-2xl font-bold text-white">Calendar</h1>
+            <p className="text-zinc-500 mt-1">Scheduled jobs and automations</p>
           </div>
           <div className="flex items-center gap-4">
             {/* View Toggle */}
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            <div className="flex bg-[#18181b] rounded-lg p-1 border border-[#27272a]">
               {(['month', 'week', 'day'] as const).map((v) => (
                 <button
                   key={v}
                   onClick={() => setView(v)}
                   className={clsx(
                     'px-3 py-1.5 text-sm font-medium rounded-md transition-colors',
-                    view === v ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'
+                    view === v ? 'bg-[#27272a] text-white' : 'text-zinc-400 hover:text-white'
                   )}
                 >
                   {v.charAt(0).toUpperCase() + v.slice(1)}
@@ -79,14 +79,14 @@ export default function CalendarPage() {
             </div>
             {/* Navigation */}
             <div className="flex items-center gap-2">
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <ChevronLeft className="w-5 h-5 text-gray-600" />
+              <button className="p-2 hover:bg-[#27272a] rounded-lg text-zinc-400 hover:text-white">
+                <ChevronLeft className="w-5 h-5" />
               </button>
-              <span className="font-medium text-gray-900 min-w-[200px] text-center">
+              <span className="font-medium text-white min-w-[200px] text-center">
                 March 2026
               </span>
-              <button className="p-2 hover:bg-gray-100 rounded-lg">
-                <ChevronRight className="w-5 h-5 text-gray-600" />
+              <button className="p-2 hover:bg-[#27272a] rounded-lg text-zinc-400 hover:text-white">
+                <ChevronRight className="w-5 h-5" />
               </button>
             </div>
           </div>
@@ -107,14 +107,14 @@ export default function CalendarPage() {
                 <div key={dateStr} className="min-h-[400px]">
                   <div className={clsx(
                     'text-center pb-3 mb-3 border-b',
-                    isToday ? 'border-indigo-300' : 'border-gray-200'
+                    isToday ? 'border-indigo-500' : 'border-[#27272a]'
                   )}>
-                    <p className="text-xs text-gray-500 uppercase">
+                    <p className="text-xs text-zinc-500 uppercase">
                       {day.toLocaleDateString('en-US', { weekday: 'short' })}
                     </p>
                     <p className={clsx(
                       'text-lg font-semibold mt-1',
-                      isToday ? 'text-indigo-600' : 'text-gray-900'
+                      isToday ? 'text-indigo-400' : 'text-white'
                     )}>
                       {day.getDate()}
                     </p>
@@ -144,31 +144,31 @@ export default function CalendarPage() {
         </div>
 
         {/* Job Registry Sidebar */}
-        <div className="w-96 border-l border-gray-200 bg-gray-50 p-4 overflow-y-auto">
-          <h2 className="font-semibold text-gray-900 mb-4">Cron Job Registry</h2>
+        <div className="w-96 border-l border-[#27272a] bg-[#0c0c0f] p-4 overflow-y-auto">
+          <h2 className="font-semibold text-white mb-4">Cron Job Registry</h2>
           <div className="space-y-3">
             {mockJobs.filter(j => j.enabled).map((job) => (
-              <div key={job.id} className="bg-white rounded-lg border border-gray-200 p-3">
+              <div key={job.id} className="bg-[#18181b] rounded-lg border border-[#27272a] p-3">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       {statusIcons[job.status]}
-                      <h3 className="font-medium text-gray-900 text-sm truncate">{job.name}</h3>
+                      <h3 className="font-medium text-white text-sm truncate">{job.name}</h3>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">{job.recurrence} at {job.time}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">Agent: {job.agent}</p>
+                    <p className="text-xs text-zinc-500 mt-1">{job.recurrence} at {job.time}</p>
+                    <p className="text-xs text-zinc-600 mt-0.5">Agent: {job.agent}</p>
                   </div>
-                  <button className="p-1.5 hover:bg-gray-100 rounded">
+                  <button className="p-1.5 hover:bg-[#27272a] rounded text-zinc-500 hover:text-white">
                     {job.enabled ? (
-                      <Pause className="w-4 h-4 text-gray-400" />
+                      <Pause className="w-4 h-4" />
                     ) : (
-                      <Play className="w-4 h-4 text-gray-400" />
+                      <Play className="w-4 h-4" />
                     )}
                   </button>
                 </div>
                 <div className="mt-2">
                   <span className={clsx(
-                    'inline-block px-2 py-0.5 rounded text-[10px] font-medium',
+                    'inline-block px-2 py-0.5 rounded text-[10px] font-medium border',
                     businessLineColors[job.businessLine]
                   )}>
                     {job.businessLine.replace('_', '.')}

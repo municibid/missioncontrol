@@ -21,8 +21,7 @@ export default function Dashboard() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Mission Control</h1>
-        <p className="text-gray-500 mt-1">Municibid • Surplus.com • Surplus.ai Operations</p>
+        <h1 className="text-2xl font-bold text-white">Marty Mission Control</h1>
       </div>
 
       {/* Stats Grid */}
@@ -31,16 +30,16 @@ export default function Dashboard() {
           <Link
             key={stat.name}
             href={stat.href}
-            className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-sm transition-all"
+            className="bg-[#18181b] rounded-xl border border-[#27272a] p-6 hover:border-indigo-500/50 hover:bg-[#1f1f23] transition-all"
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">{stat.name}</p>
-                <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
-                <p className="text-sm text-gray-400 mt-1">{stat.change}</p>
+                <p className="text-sm font-medium text-zinc-400">{stat.name}</p>
+                <p className="text-3xl font-bold text-white mt-1">{stat.value}</p>
+                <p className="text-sm text-zinc-500 mt-1">{stat.change}</p>
               </div>
-              <div className="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
-                <stat.icon className="w-6 h-6 text-indigo-600" />
+              <div className="w-12 h-12 rounded-lg bg-indigo-500/10 flex items-center justify-center">
+                <stat.icon className="w-6 h-6 text-indigo-400" />
               </div>
             </div>
           </Link>
@@ -50,10 +49,10 @@ export default function Dashboard() {
       {/* Two Column Layout */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Recent Activity */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
-            <Activity className="w-5 h-5 text-gray-400" />
+            <h2 className="text-lg font-semibold text-white">Recent Activity</h2>
+            <Activity className="w-5 h-5 text-zinc-500" />
           </div>
           <div className="space-y-4">
             {recentActivity.map((item) => (
@@ -62,12 +61,12 @@ export default function Dashboard() {
                   M
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm text-gray-900">
-                    <span className="font-medium">{item.agent}</span>
+                  <p className="text-sm text-zinc-300">
+                    <span className="font-medium text-white">{item.agent}</span>
                     {' '}{item.action}{' '}
-                    <span className="font-medium">{item.target}</span>
+                    <span className="font-medium text-white">{item.target}</span>
                   </p>
-                  <p className="text-xs text-gray-400 mt-0.5">{item.time}</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">{item.time}</p>
                 </div>
               </div>
             ))}
@@ -75,30 +74,30 @@ export default function Dashboard() {
         </div>
 
         {/* Quick Actions / Agent Status */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-lg font-semibold text-gray-900">Agent Status</h2>
+            <h2 className="text-lg font-semibold text-white">Agent Status</h2>
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-              <span className="text-sm text-green-600 font-medium">Online</span>
+              <span className="text-sm text-green-400 font-medium">Online</span>
             </div>
           </div>
           
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
+            <div className="p-4 bg-[#0f0f13] rounded-lg border border-[#27272a]">
               <div className="flex items-center gap-3 mb-2">
                 <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold">
                   M
                 </div>
                 <div>
-                  <p className="font-medium text-gray-900">Marty Muncy</p>
-                  <p className="text-xs text-gray-500">Head of Agents</p>
+                  <p className="font-medium text-white">Marty Muncy</p>
+                  <p className="text-xs text-zinc-500">Head of Agents</p>
                 </div>
               </div>
-              <div className="mt-3 text-sm text-gray-600">
+              <div className="mt-3 text-sm text-zinc-400">
                 <p className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-gray-400" />
-                  Last heartbeat: <span className="font-medium">30 seconds ago</span>
+                  <Clock className="w-4 h-4 text-zinc-500" />
+                  Last heartbeat: <span className="font-medium text-zinc-300">30 seconds ago</span>
                 </p>
               </div>
             </div>
@@ -106,13 +105,13 @@ export default function Dashboard() {
             <div className="grid grid-cols-2 gap-3">
               <Link
                 href="/tasks?new=true"
-                className="p-3 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium text-center hover:bg-indigo-100 transition-colors"
+                className="p-3 bg-indigo-600 text-white rounded-lg text-sm font-medium text-center hover:bg-indigo-700 transition-colors"
               >
                 New Task
               </Link>
               <Link
                 href="/documents"
-                className="p-3 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium text-center hover:bg-gray-100 transition-colors"
+                className="p-3 bg-[#27272a] text-zinc-300 rounded-lg text-sm font-medium text-center hover:bg-[#3f3f46] transition-colors"
               >
                 View Documents
               </Link>

@@ -78,7 +78,7 @@ const businessLineColors: Record<string, string> = {
   municibid: 'bg-blue-500',
   surplus_com: 'bg-green-500',
   surplus_ai: 'bg-purple-500',
-  personal: 'bg-gray-500',
+  personal: 'bg-zinc-500',
 };
 
 const businessLineLabels: Record<string, string> = {
@@ -89,34 +89,34 @@ const businessLineLabels: Record<string, string> = {
 };
 
 const statusStyles: Record<string, string> = {
-  active: 'bg-green-100 text-green-700',
-  paused: 'bg-yellow-100 text-yellow-700',
-  completed: 'bg-gray-100 text-gray-700',
+  active: 'bg-green-900/50 text-green-300',
+  paused: 'bg-yellow-900/50 text-yellow-300',
+  completed: 'bg-zinc-800 text-zinc-400',
 };
 
 function ProjectCard({ project }: { project: Project }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-sm transition-all">
+    <div className="bg-[#18181b] rounded-xl border border-[#27272a] p-6 hover:border-zinc-600 transition-all">
       <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className={clsx('w-3 h-3 rounded-full', businessLineColors[project.businessLine])} />
-          <span className="text-xs text-gray-500">{businessLineLabels[project.businessLine]}</span>
+          <span className="text-xs text-zinc-500">{businessLineLabels[project.businessLine]}</span>
         </div>
         <span className={clsx('px-2 py-1 rounded-full text-xs font-medium', statusStyles[project.status])}>
           {project.status}
         </span>
       </div>
 
-      <h3 className="font-semibold text-gray-900 text-lg mb-2">{project.name}</h3>
-      <p className="text-sm text-gray-500 mb-4 line-clamp-2">{project.description}</p>
+      <h3 className="font-semibold text-white text-lg mb-2">{project.name}</h3>
+      <p className="text-sm text-zinc-500 mb-4 line-clamp-2">{project.description}</p>
 
       {/* Progress Bar */}
       <div className="mb-4">
         <div className="flex items-center justify-between text-sm mb-1">
-          <span className="text-gray-500">Progress</span>
-          <span className="font-medium text-gray-700">{project.progress}%</span>
+          <span className="text-zinc-500">Progress</span>
+          <span className="font-medium text-zinc-300">{project.progress}%</span>
         </div>
-        <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className="h-2 bg-[#27272a] rounded-full overflow-hidden">
           <div 
             className="h-full bg-indigo-500 rounded-full transition-all"
             style={{ width: `${project.progress}%` }}
@@ -125,7 +125,7 @@ function ProjectCard({ project }: { project: Project }) {
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 text-sm text-gray-500">
+      <div className="flex items-center gap-4 text-sm text-zinc-500">
         <div className="flex items-center gap-1">
           <CheckSquare className="w-4 h-4" />
           <span>{project.tasksCount} tasks</span>
@@ -136,7 +136,7 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
 
-      <div className="mt-4 pt-4 border-t border-gray-100 text-xs text-gray-400">
+      <div className="mt-4 pt-4 border-t border-[#27272a] text-xs text-zinc-600">
         Last activity: {project.lastActivity}
       </div>
     </div>
@@ -155,8 +155,8 @@ export default function ProjectsPage() {
       {/* Header */}
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
-          <p className="text-gray-500 mt-1">Track progress across all initiatives</p>
+          <h1 className="text-2xl font-bold text-white">Projects</h1>
+          <p className="text-zinc-500 mt-1">Track progress across all initiatives</p>
         </div>
         <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors">
           <Plus className="w-4 h-4" />
@@ -179,8 +179,8 @@ export default function ProjectsPage() {
             className={clsx(
               'px-3 py-1.5 rounded-lg text-sm font-medium transition-colors',
               filter === f.id
-                ? 'bg-indigo-100 text-indigo-700'
-                : 'text-gray-500 hover:bg-gray-100'
+                ? 'bg-indigo-600 text-white'
+                : 'text-zinc-400 hover:bg-[#27272a] hover:text-white'
             )}
           >
             {f.label}

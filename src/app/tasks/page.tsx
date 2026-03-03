@@ -28,17 +28,17 @@ const initialTasks: Task[] = [
 ];
 
 const columns: { id: TaskStatus; title: string; color: string }[] = [
-  { id: 'backlog', title: 'Backlog', color: 'bg-gray-100' },
-  { id: 'in_progress', title: 'In Progress', color: 'bg-blue-50' },
-  { id: 'review', title: 'Review', color: 'bg-yellow-50' },
-  { id: 'done', title: 'Done', color: 'bg-green-50' },
+  { id: 'backlog', title: 'Backlog', color: 'bg-zinc-800/50' },
+  { id: 'in_progress', title: 'In Progress', color: 'bg-blue-900/20' },
+  { id: 'review', title: 'Review', color: 'bg-yellow-900/20' },
+  { id: 'done', title: 'Done', color: 'bg-green-900/20' },
 ];
 
 const priorityColors: Record<Priority, string> = {
-  low: 'bg-gray-200 text-gray-700',
-  medium: 'bg-blue-100 text-blue-700',
-  high: 'bg-orange-100 text-orange-700',
-  urgent: 'bg-red-100 text-red-700',
+  low: 'bg-zinc-700 text-zinc-300',
+  medium: 'bg-blue-900/50 text-blue-300',
+  high: 'bg-orange-900/50 text-orange-300',
+  urgent: 'bg-red-900/50 text-red-300',
 };
 
 const assigneeAvatars: Record<string, { bg: string; letter: string }> = {
@@ -51,16 +51,16 @@ function TaskCard({ task }: { task: Task }) {
   const avatar = assigneeAvatars[task.assignee];
   
   return (
-    <div className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow cursor-pointer">
+    <div className="bg-[#18181b] rounded-lg border border-[#27272a] p-4 hover:border-zinc-600 transition-all cursor-pointer">
       <div className="flex items-start justify-between gap-2 mb-2">
-        <h3 className="font-medium text-gray-900 text-sm leading-tight">{task.title}</h3>
-        <button className="text-gray-400 hover:text-gray-600 shrink-0">
+        <h3 className="font-medium text-white text-sm leading-tight">{task.title}</h3>
+        <button className="text-zinc-500 hover:text-zinc-300 shrink-0">
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
       
       {task.description && (
-        <p className="text-xs text-gray-500 mb-3 line-clamp-2">{task.description}</p>
+        <p className="text-xs text-zinc-500 mb-3 line-clamp-2">{task.description}</p>
       )}
       
       <div className="flex items-center justify-between">
@@ -86,8 +86,8 @@ function ActivityFeed() {
   ];
 
   return (
-    <div className="w-80 border-l border-gray-200 bg-gray-50 p-4 overflow-y-auto">
-      <h2 className="font-semibold text-gray-900 mb-4">Activity Feed</h2>
+    <div className="w-80 border-l border-[#27272a] bg-[#0c0c0f] p-4 overflow-y-auto">
+      <h2 className="font-semibold text-white mb-4">Activity Feed</h2>
       <div className="space-y-3">
         {activities.map((activity) => (
           <div key={activity.id} className="flex items-start gap-3 text-sm">
@@ -95,13 +95,13 @@ function ActivityFeed() {
               M
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-gray-700">
-                <span className="font-medium">{activity.agent}</span>{' '}
+              <p className="text-zinc-300">
+                <span className="font-medium text-white">{activity.agent}</span>{' '}
                 {activity.action}{' '}
-                <span className="font-medium">{activity.target}</span>
-                {activity.to && <span> → {activity.to}</span>}
+                <span className="font-medium text-white">{activity.target}</span>
+                {activity.to && <span className="text-zinc-400"> → {activity.to}</span>}
               </p>
-              <p className="text-xs text-gray-400">{activity.time}</p>
+              <p className="text-xs text-zinc-500">{activity.time}</p>
             </div>
           </div>
         ))}
@@ -120,11 +120,11 @@ export default function TaskBoard() {
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <div className="px-8 py-6 border-b border-gray-200 bg-white">
+      <div className="px-8 py-6 border-b border-[#27272a] bg-[#0f0f13]">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Task Board</h1>
-            <p className="text-gray-500 mt-1">Manage tasks across all projects</p>
+            <h1 className="text-2xl font-bold text-white">Task Board</h1>
+            <p className="text-zinc-500 mt-1">Manage tasks across all projects</p>
           </div>
           <button 
             onClick={() => setShowNewTask(true)}
@@ -141,10 +141,10 @@ export default function TaskBoard() {
         <div className="flex-1 flex gap-6 p-6 overflow-x-auto">
           {columns.map((column) => (
             <div key={column.id} className="flex-1 min-w-[280px] max-w-[350px]">
-              <div className={clsx('rounded-xl p-4 h-full', column.color)}>
+              <div className={clsx('rounded-xl p-4 h-full border border-[#27272a]', column.color)}>
                 <div className="flex items-center justify-between mb-4">
-                  <h2 className="font-semibold text-gray-700">{column.title}</h2>
-                  <span className="text-sm text-gray-500 bg-white px-2 py-0.5 rounded-full">
+                  <h2 className="font-semibold text-zinc-300">{column.title}</h2>
+                  <span className="text-sm text-zinc-500 bg-[#27272a] px-2 py-0.5 rounded-full">
                     {getTasksByStatus(column.id).length}
                   </span>
                 </div>
@@ -164,38 +164,38 @@ export default function TaskBoard() {
 
       {/* New Task Modal */}
       {showNewTask && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg p-6 m-4">
-            <h2 className="text-xl font-semibold mb-4">New Task</h2>
+        <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50">
+          <div className="bg-[#18181b] rounded-xl border border-[#27272a] shadow-xl w-full max-w-lg p-6 m-4">
+            <h2 className="text-xl font-semibold text-white mb-4">New Task</h2>
             <form className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-1">Title</label>
                 <input 
                   type="text" 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   placeholder="Task title..."
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-zinc-300 mb-1">Description</label>
                 <textarea 
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                  className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
                   rows={3}
                   placeholder="Describe the task..."
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Assignee</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <label className="block text-sm font-medium text-zinc-300 mb-1">Assignee</label>
+                  <select className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="marty">Marty</option>
                     <option value="greg">Greg</option>
                     <option value="mara">MARA</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                  <label className="block text-sm font-medium text-zinc-300 mb-1">Priority</label>
+                  <select className="w-full px-3 py-2 bg-[#0f0f13] border border-[#27272a] rounded-lg text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
                     <option value="medium">Medium</option>
                     <option value="low">Low</option>
                     <option value="high">High</option>
@@ -207,7 +207,7 @@ export default function TaskBoard() {
                 <button 
                   type="button"
                   onClick={() => setShowNewTask(false)}
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-zinc-300 hover:bg-[#27272a] rounded-lg transition-colors"
                 >
                   Cancel
                 </button>

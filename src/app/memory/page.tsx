@@ -92,14 +92,14 @@ function MemoryCard({ memory, expanded, onToggle }: { memory: Memory; expanded: 
   return (
     <div 
       className={clsx(
-        'bg-white rounded-lg border border-gray-200 p-4 cursor-pointer transition-all',
-        expanded ? 'ring-2 ring-indigo-200' : 'hover:border-gray-300'
+        'bg-[#18181b] rounded-lg border border-[#27272a] p-4 cursor-pointer transition-all',
+        expanded ? 'ring-2 ring-indigo-500/50' : 'hover:border-zinc-600'
       )}
       onClick={onToggle}
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
-          <div className="flex items-center gap-2 text-sm text-gray-500 mb-2">
+          <div className="flex items-center gap-2 text-sm text-zinc-500 mb-2">
             <Calendar className="w-4 h-4" />
             {new Date(memory.date).toLocaleDateString('en-US', { 
               weekday: 'long', 
@@ -109,23 +109,23 @@ function MemoryCard({ memory, expanded, onToggle }: { memory: Memory; expanded: 
             })}
           </div>
           {expanded ? (
-            <div className="prose prose-sm max-w-none">
-              <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans bg-gray-50 p-3 rounded-lg">
+            <div className="prose prose-sm prose-invert max-w-none">
+              <pre className="whitespace-pre-wrap text-sm text-zinc-300 font-sans bg-[#0f0f13] p-3 rounded-lg border border-[#27272a]">
                 {memory.content}
               </pre>
             </div>
           ) : (
-            <p className="text-gray-700 text-sm">{memory.preview}</p>
+            <p className="text-zinc-300 text-sm">{memory.preview}</p>
           )}
         </div>
         <ChevronRight className={clsx(
-          'w-5 h-5 text-gray-400 transition-transform shrink-0 ml-2',
+          'w-5 h-5 text-zinc-500 transition-transform shrink-0 ml-2',
           expanded && 'rotate-90'
         )} />
       </div>
       <div className="flex items-center gap-2 mt-3">
         {memory.tags.map((tag) => (
-          <span key={tag} className="px-2 py-0.5 bg-gray-100 text-gray-600 rounded text-xs">
+          <span key={tag} className="px-2 py-0.5 bg-[#27272a] text-zinc-400 rounded text-xs">
             {tag}
           </span>
         ))}
@@ -145,31 +145,31 @@ export default function MemoryPage() {
     <div className="p-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">Memory Browser</h1>
-        <p className="text-gray-500 mt-1">Browse and search conversation memories</p>
+        <h1 className="text-2xl font-bold text-white">Memory Browser</h1>
+        <p className="text-zinc-500 mt-1">Browse and search conversation memories</p>
       </div>
 
       {/* Search */}
       <div className="relative mb-6">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
         <input
           type="text"
           placeholder="Search memories..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+          className="w-full pl-10 pr-4 py-3 bg-[#18181b] border border-[#27272a] rounded-xl text-white placeholder-zinc-500 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
         />
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-gray-200">
+      <div className="flex gap-4 mb-6 border-b border-[#27272a]">
         <button
           onClick={() => setActiveTab('daily')}
           className={clsx(
             'flex items-center gap-2 px-4 py-3 border-b-2 transition-colors',
             activeTab === 'daily'
-              ? 'border-indigo-500 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'border-indigo-500 text-indigo-400'
+              : 'border-transparent text-zinc-500 hover:text-zinc-300'
           )}
         >
           <Calendar className="w-4 h-4" />
@@ -180,8 +180,8 @@ export default function MemoryPage() {
           className={clsx(
             'flex items-center gap-2 px-4 py-3 border-b-2 transition-colors',
             activeTab === 'long_term'
-              ? 'border-indigo-500 text-indigo-600'
-              : 'border-transparent text-gray-500 hover:text-gray-700'
+              ? 'border-indigo-500 text-indigo-400'
+              : 'border-transparent text-zinc-500 hover:text-zinc-300'
           )}
         >
           <Brain className="w-4 h-4" />
