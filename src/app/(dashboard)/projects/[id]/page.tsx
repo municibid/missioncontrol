@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, CheckSquare, FileText, Calendar, TrendingUp, Edit2, Trash2 } from 'lucide-react';
+import { ArrowLeft, CheckSquare, CheckCircle2, FileText, Calendar, TrendingUp, Edit2, Trash2, Clock } from 'lucide-react';
 
 interface Project {
   id: string;
@@ -22,6 +22,8 @@ interface Task {
   status: string;
   priority: string;
   assignee: string;
+  completed_at: string | null;
+  project_id: string;
 }
 
 interface Document {
@@ -279,44 +281,91 @@ export default function ProjectDetailPage() {
         )}
       </div>
 
-      {/* Tasks Section */}
+      {/* What's Been Done - Completed Tasks */}
+      {tasks.filter(t => t.status === 'done').length > 0 && (
+        <div className="bg-[#12121a] border border-emerald-500/20 rounded-xl p-6 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-lg font-semibold text-white">What's Been Done</h2>
+            <span className="text-emerald-400 text-sm">({tasks.filter(t => t.status === 'done').length} completed)</span>
+          </div>
+          
+          <div className="space-y-2">
+            {tasks
+              .filter(t => t.status === 'done')
+              .sort((a, b) => new Date(b.completed_at || 0).getTime() - new Date(a.completed_at || 0).getTime())
+              .map((task) => (
+                <div 
+                  key={task.id}
+                  className="flex items-center justify-between p-3 bg-emerald-500/5 rounded-lg border border-emerald-500/10"
+                >
+                  <div className="flex items-center gap-3">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                    <span className="text-zinc-300">{task.title}</span>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-zinc-500">
+                    {task.assignee && (
+                      <span>{task.assignee}</span>
+                    )}
+                    {task.completed_at && (
+                      <span className="flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        {new Date(task.completed_at).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      )}
+
+      {/* Active Tasks */}
       <div className="bg-[#12121a] border border-[#2a2a3a] rounded-xl p-6 mb-6">
         <div className="flex items-center gap-2 mb-4">
           <CheckSquare className="w-5 h-5 text-indigo-400" />
-          <h2 className="text-lg font-semibold text-white">Tasks</h2>
-          <span className="text-zinc-500 text-sm">({tasks.length})</span>
+          <h2 className="text-lg font-semibold text-white">Active Tasks</h2>
+          <span className="text-zinc-500 text-sm">({tasks.filter(t => t.status !== 'done').length})</span>
         </div>
         
-        {tasks.length === 0 ? (
-          <p className="text-zinc-500 text-sm">No tasks linked to this project yet.</p>
+        {tasks.filter(t => t.status !== 'done').length === 0 ? (
+          <p className="text-zinc-500 text-sm">No active tasks. All caught up! 🎉</p>
         ) : (
           <div className="space-y-2">
-            {tasks.map((task) => (
-              <div 
-                key={task.id}
-                className="flex items-center justify-between p-3 bg-[#1a1a24] rounded-lg"
-              >
-                <div className="flex items-center gap-3">
-                  <span className={`w-2 h-2 rounded-full ${
-                    task.status === 'done' ? 'bg-emerald-400' :
-                    task.status === 'in_progress' ? 'bg-amber-400' : 'bg-zinc-500'
-                  }`} />
-                  <span className="text-white">{task.title}</span>
+            {tasks
+              .filter(t => t.status !== 'done')
+              .map((task) => (
+                <div 
+                  key={task.id}
+                  className="flex items-center justify-between p-3 bg-[#1a1a24] rounded-lg"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className={`w-2 h-2 rounded-full ${
+                      task.status === 'in_progress' ? 'bg-amber-400' : 'bg-zinc-500'
+                    }`} />
+                    <span className="text-white">{task.title}</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-0.5 rounded text-xs ${
+                      task.status === 'in_progress' 
+                        ? 'bg-amber-500/10 text-amber-400' 
+                        : 'bg-zinc-500/10 text-zinc-400'
+                    }`}>
+                      {task.status === 'in_progress' ? 'In Progress' : 'Backlog'}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded text-xs ${
+                      task.priority === 'high' ? 'bg-red-500/10 text-red-400' :
+                      task.priority === 'medium' ? 'bg-amber-500/10 text-amber-400' :
+                      'bg-zinc-500/10 text-zinc-400'
+                    }`}>
+                      {task.priority}
+                    </span>
+                    {task.assignee && (
+                      <span className="text-zinc-500 text-sm">{task.assignee}</span>
+                    )}
+                  </div>
                 </div>
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-0.5 rounded text-xs ${
-                    task.priority === 'high' ? 'bg-red-500/10 text-red-400' :
-                    task.priority === 'medium' ? 'bg-amber-500/10 text-amber-400' :
-                    'bg-zinc-500/10 text-zinc-400'
-                  }`}>
-                    {task.priority}
-                  </span>
-                  {task.assignee && (
-                    <span className="text-zinc-500 text-sm">{task.assignee}</span>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))}
           </div>
         )}
       </div>
