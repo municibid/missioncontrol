@@ -1,65 +1,125 @@
-import Image from "next/image";
+import { CheckSquare, Calendar, FolderKanban, FileText, Brain, Users, Activity, Clock } from 'lucide-react';
+import Link from 'next/link';
 
-export default function Home() {
+const stats = [
+  { name: 'Active Tasks', value: '12', change: '+3 today', icon: CheckSquare, href: '/tasks' },
+  { name: 'Scheduled Jobs', value: '8', change: 'Next: 2h', icon: Calendar, href: '/calendar' },
+  { name: 'Projects', value: '5', change: '2 active', icon: FolderKanban, href: '/projects' },
+  { name: 'Documents', value: '47', change: '+5 this week', icon: FileText, href: '/documents' },
+];
+
+const recentActivity = [
+  { id: 1, action: 'Completed task', target: 'Weekly WFA Newsletter Draft', time: '2 min ago', agent: 'Marty' },
+  { id: 2, action: 'Created document', target: 'Webflow Migration Guide', time: '15 min ago', agent: 'Marty' },
+  { id: 3, action: 'Updated memory', target: 'Municibid Team Contacts', time: '1 hour ago', agent: 'Marty' },
+  { id: 4, action: 'Scheduled cron', target: 'Weekly SEO Report', time: '2 hours ago', agent: 'Marty' },
+  { id: 5, action: 'Completed task', target: 'WFA Monitor Check', time: '3 hours ago', agent: 'Marty' },
+];
+
+export default function Dashboard() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div className="p-8">
+      {/* Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Mission Control</h1>
+        <p className="text-gray-500 mt-1">Municibid • Surplus.com • Surplus.ai Operations</p>
+      </div>
+
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {stats.map((stat) => (
+          <Link
+            key={stat.name}
+            href={stat.href}
+            className="bg-white rounded-xl border border-gray-200 p-6 hover:border-indigo-300 hover:shadow-sm transition-all"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-gray-500">{stat.name}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{stat.value}</p>
+                <p className="text-sm text-gray-400 mt-1">{stat.change}</p>
+              </div>
+              <div className="w-12 h-12 rounded-lg bg-indigo-50 flex items-center justify-center">
+                <stat.icon className="w-6 h-6 text-indigo-600" />
+              </div>
+            </div>
+          </Link>
+        ))}
+      </div>
+
+      {/* Two Column Layout */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Recent Activity */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Recent Activity</h2>
+            <Activity className="w-5 h-5 text-gray-400" />
+          </div>
+          <div className="space-y-4">
+            {recentActivity.map((item) => (
+              <div key={item.id} className="flex items-start gap-4">
+                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+                  M
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-gray-900">
+                    <span className="font-medium">{item.agent}</span>
+                    {' '}{item.action}{' '}
+                    <span className="font-medium">{item.target}</span>
+                  </p>
+                  <p className="text-xs text-gray-400 mt-0.5">{item.time}</p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
-      </main>
+
+        {/* Quick Actions / Agent Status */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-lg font-semibold text-gray-900">Agent Status</h2>
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
+              <span className="text-sm text-green-600 font-medium">Online</span>
+            </div>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="p-4 bg-gray-50 rounded-lg">
+              <div className="flex items-center gap-3 mb-2">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold">
+                  M
+                </div>
+                <div>
+                  <p className="font-medium text-gray-900">Marty Muncy</p>
+                  <p className="text-xs text-gray-500">Head of Agents</p>
+                </div>
+              </div>
+              <div className="mt-3 text-sm text-gray-600">
+                <p className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  Last heartbeat: <span className="font-medium">30 seconds ago</span>
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <Link
+                href="/tasks?new=true"
+                className="p-3 bg-indigo-50 text-indigo-700 rounded-lg text-sm font-medium text-center hover:bg-indigo-100 transition-colors"
+              >
+                New Task
+              </Link>
+              <Link
+                href="/documents"
+                className="p-3 bg-gray-50 text-gray-700 rounded-lg text-sm font-medium text-center hover:bg-gray-100 transition-colors"
+              >
+                View Documents
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
