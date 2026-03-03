@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useSession, signOut } from 'next-auth/react';
 import { 
   LayoutDashboard, 
   CheckSquare, 
@@ -10,7 +11,7 @@ import {
   Brain, 
   FileText, 
   Users,
-  Zap
+  LogOut
 } from 'lucide-react';
 import { clsx } from 'clsx';
 
@@ -26,6 +27,7 @@ const navigation = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-[#0c0c0f] border-r border-[#1f1f23] flex flex-col">
@@ -63,20 +65,46 @@ export function Sidebar() {
         })}
       </nav>
 
-      {/* Agent Status */}
+      {/* User Profile */}
       <div className="px-4 py-4 border-t border-[#1f1f23]">
-        <div className="flex items-center gap-3">
-          <div className="relative">
-            <div className="w-9 h-9 rounded-full bg-gradient-to-br from-emerald-400 to-cyan-500 flex items-center justify-center text-white font-bold text-sm">
-              M
+        {session?.user ? (
+          <div className="flex items-center gap-3">
+            <div className="relative">
+              {session.user.image ? (
+                <img 
+                  src={session.user.image} 
+                  alt={session.user.name || ''} 
+                  className="w-9 h-9 rounded-full"
+                />
+              ) : (
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo-400 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                  {session.user.name?.[0] || session.user.email?.[0] || '?'}
+                </div>
+              )}
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-[#0c0c0f]" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-medium text-white truncate">
+                {session.user.name || session.user.email}
+              </p>
+              <p className="text-xs text-zinc-500 truncate">{session.user.email}</p>
+            </div>
+            <button
+              onClick={() => signOut({ callbackUrl: '/auth/signin' })}
+              className="p-2 text-zinc-400 hover:text-white hover:bg-[#1f1f23] rounded-lg transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Marty</p>
-            <p className="text-xs text-zinc-500">Active</p>
+        ) : (
+          <div className="flex items-center gap-3">
+            <div className="w-9 h-9 rounded-full bg-zinc-800 animate-pulse" />
+            <div className="flex-1">
+              <div className="h-4 bg-zinc-800 rounded animate-pulse mb-1" />
+              <div className="h-3 bg-zinc-800 rounded animate-pulse w-2/3" />
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </aside>
   );
