@@ -1,9 +1,17 @@
-import { neon } from '@neondatabase/serverless';
+import { neon, NeonQueryFunction } from '@neondatabase/serverless';
 
-// Database connection - uses the same Neon instance as MARA CRM
-const sql = neon(process.env.DATABASE_URL!);
+// Lazy database connection - only connects when actually used
+let _sql: NeonQueryFunction<false, false> | null = null;
 
-export { sql };
+export function getDb() {
+  if (!_sql) {
+    if (!process.env.DATABASE_URL) {
+      throw new Error('DATABASE_URL is not set');
+    }
+    _sql = neon(process.env.DATABASE_URL);
+  }
+  return _sql;
+}
 
 // Task status types
 export type TaskStatus = 'backlog' | 'in_progress' | 'review' | 'done';
